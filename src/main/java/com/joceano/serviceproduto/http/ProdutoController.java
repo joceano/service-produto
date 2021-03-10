@@ -1,28 +1,41 @@
 package com.joceano.serviceproduto.http;
 
 import com.joceano.serviceproduto.http.data.request.ProdutoPersistDto;
-import com.joceano.serviceproduto.http.data.response.ProdutoResponseDto;
 import com.joceano.serviceproduto.model.Produto;
-import com.joceano.serviceproduto.service.ProdutoService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("produto")
-public class ProdutoController {
+import javax.validation.Valid;
 
-    private final ProdutoService produtoService;
-
-    public ProdutoController(ProdutoService produtoService) {
-        this.produtoService = produtoService;
-    }
+public interface ProdutoController {
 
     @PostMapping
-    public ProdutoResponseDto inserir(@RequestBody ProdutoPersistDto dto) {
-        Produto produto = new Produto(dto.getDescricao(), dto.getValor());
-        Produto produtoPersistido = produtoService.inserir(produto);
-        return new ProdutoResponseDto(produtoPersistido.getId(), produtoPersistido.getDescricao());
-    }
+    @ResponseStatus(HttpStatus.CREATED)
+    Produto inserir(@Valid @RequestBody ProdutoPersistDto dto);
+
+    @Operation(summary = "Retorna o produto correspondente ao identificador recuperado por parâmetro")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "404",
+                    content = @Content (
+                            mediaType = "application/json",
+                            examples = @ExampleObject(
+                                    value = """
+                                            {
+                                                "codigo": "X_100",
+                                                "mensagem": "Produto de código 5777 não encontrado",
+                                                "documentacao": null
+                                            }
+                                            """
+                            )
+                    )
+            )
+    })
+    @GetMapping("{id}")
+    Produto one(@PathVariable("id") Long id);
 }

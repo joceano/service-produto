@@ -5,4 +5,6 @@ import com.joceano.serviceproduto.model.Produto;
 public interface ProdutoService {
 
     Produto inserir(Produto produto);
+
+    Produto one(Long id);
 }
