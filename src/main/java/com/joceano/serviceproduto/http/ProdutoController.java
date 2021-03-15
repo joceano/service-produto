@@ -1,5 +1,8 @@
 package com.joceano.serviceproduto.http;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.github.fge.jsonpatch.JsonPatch;
+import com.github.fge.jsonpatch.JsonPatchException;
 import com.joceano.serviceproduto.http.data.request.ProdutoPersistDto;
 import com.joceano.serviceproduto.model.Produto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,4 +41,7 @@ public interface ProdutoController {
     })
     @GetMapping("{id}")
     Produto one(@PathVariable("id") Long id);
+
+    @PatchMapping("{id}")
+    Produto update(@PathVariable("id") Long id, @RequestBody JsonPatch patch) throws JsonPatchException, JsonProcessingException;
 }
