@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  jms:
+    container_name: jms
+    image: vromero/activemq-artemis
+    restart: always
+    environment:
+      ARTEMIS_USERNAME: 'gasparbarancelli'
+      ARTEMIS_PASSWORD: 'live'
+    ports:
+      - 61616:61616
+      - 8161:8161
+    expose:
+      - 61616
+      - 8161

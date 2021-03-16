@@ -1,7 +1,9 @@
 package com.joceano.serviceproduto.service;
 
+import com.joceano.serviceproduto.event.ProdutoPersistEvent;
 import com.joceano.serviceproduto.model.Produto;
 import com.joceano.serviceproduto.repository.ProdutoRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.NoResultException;
@@ -11,13 +13,18 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     private final ProdutoRepository produtoRepository;
 
-    public ProdutoServiceImpl(ProdutoRepository produtoRepository) {
+    private final ApplicationEventPublisher publisher;
+
+    public ProdutoServiceImpl(ProdutoRepository produtoRepository, ApplicationEventPublisher publisher) {
         this.produtoRepository = produtoRepository;
+        this.publisher = publisher;
     }
 
     @Override
     public Produto save(Produto produto) {
-        return produtoRepository.save(produto);
+        Produto produtoPersist = produtoRepository.save(produto);
+        publisher.publishEvent(new ProdutoPersistEvent(this, produto));
+        return produtoPersist;
     }
 
     @Override
@@ -39,6 +46,6 @@ public class ProdutoServiceImpl implements ProdutoService {
         if (!produtoRepository.existsById(produto.getId())) {
             throw new NoResultException(String.format("Produto de código %d não encontrado", produto.getId()));
         }
-        return produtoRepository.save(produto);
+        return save(produto);
     }
 }
